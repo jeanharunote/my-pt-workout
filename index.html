@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>MY PT - 6일 운동 프로그램</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+    }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+    @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(0,255,136,0.3); } 50% { box-shadow: 0 0 40px rgba(0,255,136,0.5); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    
+    .app {
+      height: 100vh;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    }
+    
+    .screen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .screen.active { display: block; animation: fadeIn 0.3s ease; }
+    .screen.slide-in { animation: slideIn 0.4s ease; }
+    
+    /* ===== HOME ===== */
+    #homeScreen { padding: 0 0 100px; }
+    
+    .home-header {
+      padding: 50px 24px 24px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+    }
+    .greeting { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+    .home-title { font-size: 26px; font-weight: 800; line-height: 1.3; }
+    .home-title span {
+      background: linear-gradient(135deg, #00ff88, #00d4aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .home-content { padding: 0 20px; }
+    
+    /* Today Card */
+    .today-card {
+      background: linear-gradient(135deg, #00ff88 0%, #00d4aa 100%);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: slideUp 0.5s ease 0.1s both;
+    }
+    .today-card:active { transform: scale(0.98); }
+    .today-card::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -25%;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+    }
+    .today-badge {
+      display: inline-block;
+      background: rgba(0,0,0,0.2);
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: rgba(0,0,0,0.7);
+      margin-bottom: 12px;
+    }
+    .today-title { font-size: 28px; font-weight: 900; color: #000; margin-bottom: 6px; position: relative; z-index: 1; }
+    .today-subtitle { font-size: 13px; color: rgba(0,0,0,0.6); margin-bottom: 16px; position: relative; z-index: 1; }
+    .today-stats { display: flex; gap: 10px; position: relative; z-index: 1; }
+    .today-stat {
+      background: rgba(0,0,0,0.15);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(0,0,0,0.8);
+    }
+    .today-arrow {
+      position: absolute;
+      right: 20px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      color: rgba(0,0,0,0.3);
+    }
+    
+    /* Week Schedule */
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title span { font-size: 18px; }
+    
+    .week-schedule {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+      animation: slideUp 0.5s ease 0.2s both;
+    }
+    
+    .day-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .day-card:active { transform: scale(0.95); }
+    .day-card.today {
+      border: 2px solid rgba(0,255,136,0.5);
+      background: rgba(0,255,136,0.08);
+    }
+    .day-card.rest {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .day-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 6px; font-weight: 600; }
+    .day-emoji { font-size: 28px; margin-bottom: 6px; }
+    .day-name { font-size: 13px; font-weight: 700; }
+    .day-today-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #00ff88, #00d4aa);
+      color: #000;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 8px;
+      margin-top: 6px;
+    }
+    
+    /* Cardio Section Home */
+    .cardio-home {
+      background: rgba(255,100,100,0.08);
+      border: 1px solid rgba(255,100,100,0.2);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 20px;
+      animation: slideUp 0.5s ease 0.3s both;
+    }
+    .cardio-home-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: #ff6b6b; }
+    .cardio-home-items { display: flex; gap: 10px; }
+    .cardio-home-item {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .cardio-home-item:active { transform: scale(0.95); }
+    .cardio-home-item .emoji { font-size: 24px; margin-bottom: 6px; }
+    .cardio-home-item .name { font-size: 12px; font-weight: 600; }
+    .cardio-home-item .duration { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    
+    /* Stats */
+    .stats-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 18px;
+      animation: slideUp 0.5s ease 0.4s both;
+    }
+    .stats-title { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600; letter-spacing: 1px; margin-bottom: 14px; }
+    .stats-row { display: flex; justify-content: space-between; }
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 22px; font-weight: 800; color: #00ff88; }
+    .stat-label { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    
+    /* ===== WORKOUT SCREEN ===== */
+    #workoutScreen { padding-bottom: 100px; }
+    
+    .workout-header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.9) 80%, transparent 100%);
+      padding: 16px 20px 24px;
+      z-index: 100;
+    }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: #00ff88;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 0;
+      margin-bottom: 12px;
+      font-family: inherit;
+    }
+    .workout-title-area { display: flex; justify-content: space-between; align-items: flex-start; }
+    .workout-main-title { font-size: 24px; font-weight: 800; }
+    .workout-date { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .workout-meta { text-align: right; }
+    .workout-meta-item { font-size: 11px; color: rgba(255,255,255,0.6); }
+    .workout-meta-item strong { color: #00ff88; }
+    
+    /* Progress */
+    .progress-section { padding: 0 20px; margin-bottom: 16px; }
+    .progress-box {
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .progress-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .progress-label { font-size: 12px; font-weight: 600; }
+    .progress-count { font-size: 12px; color: #00ff88; font-weight: 700; }
+    .progress-bar { background: rgba(255,255,255,0.1); border-radius: 8px; height: 8px; overflow: hidden; }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00ff88, #00d4aa);
+      border-radius: 8px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    /* Exercise Cards */
+    .exercise-section { padding: 0 20px; }
+    .exercise-list { display: flex; flex-direction: column; gap: 12px; }
+    
+    .exercise-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .exercise-card:active { transform: scale(0.98); }
+    .exercise-card.completed {
+      background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,212,170,0.05) 100%);
+      border: 2px solid rgba(0,255,136,0.4);
+    }
+    
+    .exercise-main { padding: 16px; display: flex; gap: 14px; align-items: center; }
+    
+    .exercise-illustration {
+      width: 70px;
+      height: 70px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .exercise-illustration svg { width: 50px; height: 50px; }
+    
+    .exercise-info { flex: 1; min-width: 0; }
+    .exercise-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+    .exercise-name-en { font-size: 10px; color: rgba(255,255,255,0.35); margin-bottom: 8px; }
+    .exercise-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .tag { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 500; }
+    .tag-sets { background: rgba(0,255,136,0.15); color: #00ff88; font-weight: 600; }
+    .tag-reps { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+    .tag-rest { background: rgba(255,200,0,0.12); color: #ffc800; }
+    
+    .check-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: rgba(255,255,255,0.3);
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+    .check-btn.checked {
+      border: none;
+      background: linear-gradient(135deg, #00ff88, #00d4aa);
+      color: #000;
+      font-weight: 700;
+    }
+    
+    /* Exercise Details */
+    .exercise-details {
+      display: none;
+      padding: 0 16px 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .exercise-card.expanded .exercise-details { display: block; padding-top: 16px; }
+    
+    .detail-illustration {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,212,170,0.05));
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .detail-illustration svg { width: 120px; height: 120px; }
+    
+    .detail-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .detail-value { font-size: 13px; color: #00ff88; margin-bottom: 14px; }
+    
+    .instructions { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+    .instruction-item { display: flex; gap: 10px; align-items: flex-start; }
+    .instruction-num {
+      min-width: 20px; height: 20px;
+      background: rgba(0,255,136,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #00ff88;
+      font-weight: 700;
+    }
+    .instruction-text { font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+    
+    .tip-box {
+      background: rgba(255,200,0,0.1);
+      border: 1px solid rgba(255,200,0,0.2);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .tip-label { font-size: 10px; color: #ffc800; font-weight: 600; }
+    .tip-text { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 4px; line-height: 1.4; }
+    
+    /* Cardio Section */
+    .cardio-section { padding: 0 20px; margin-top: 20px; }
+    .cardio-title-row { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: #ff6b6b; }
+    
+    .cardio-options { display: flex; gap: 10px; }
+    .cardio-option-card {
+      flex: 1;
+      background: linear-gradient(135deg, rgba(255,100,100,0.1), rgba(255,50,50,0.05));
+      border: 1px solid rgba(255,100,100,0.2);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .cardio-option-card:active { transform: scale(0.95); }
+    .cardio-option-card.expanded { border-color: rgba(255,100,100,0.5); }
+    
+    .cardio-option-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .cardio-option-icon { font-size: 28px; }
+    .cardio-option-name { font-size: 14px; font-weight: 700; }
+    .cardio-option-duration { font-size: 11px; color: rgba(255,255,255,0.5); }
+    
+    .cardio-option-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,100,100,0.15); }
+    .cardio-option-card.expanded .cardio-option-details { display: block; }
+    
+    .cardio-detail-item { margin-bottom: 10px; }
+    .cardio-detail-label { font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 600; }
+    .cardio-detail-value { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+    
+    /* Complete Banner */
+    .complete-banner {
+      display: none;
+      margin: 20px;
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(0,255,136,0.15), rgba(0,212,170,0.1));
+      border-radius: 20px;
+      border: 1px solid rgba(0,255,136,0.3);
+      animation: glow 2s infinite;
+    }
+    .complete-banner.show { display: block; }
+    .complete-emoji { font-size: 40px; display: block; margin-bottom: 10px; animation: float 2s infinite; }
+    .complete-title {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00ff88, #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .complete-desc { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 6px; }
+    
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 0 22px;
+      z-index: 1000;
+    }
+    .nav-inner { max-width: 500px; margin: 0 auto; display: flex; justify-content: space-around; padding: 0 10px; }
+    .nav-item {
+      text-align: center;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: all 0.3s ease;
+      padding: 6px 10px;
+    }
+    .nav-item:active { transform: scale(0.9); }
+    .nav-item.active { opacity: 1; }
+    .nav-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 3px;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+    .nav-item.active .nav-icon { background: linear-gradient(135deg, #00ff88, #00d4aa); }
+    .nav-label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.5); }
+    .nav-item.active .nav-label { color: #00ff88; }
+    
+    ::-webkit-scrollbar { width: 0; height: 0; }
+    
+    /* SVG Colors */
+    .exercise-svg { fill: none; stroke: #00ff88; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .exercise-svg-detail { fill: none; stroke: #00ff88; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .muscle-highlight { fill: rgba(0,255,136,0.2); stroke: #00ff88; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- HOME SCREEN -->
+    <div class="screen active" id="homeScreen">
+      <div class="home-header">
+        <p class="greeting" id="greeting">좋은 아침이에요 ☀️</p>
+        <h1 class="home-title">오늘도 <span>열심히</span><br>운동해볼까요?</h1>
+      </div>
+      
+      <div class="home-content">
+        <div class="today-card" onclick="openTodayWorkout()">
+          <span class="today-badge">🎯 TODAY'S WORKOUT</span>
+          <h2 class="today-title" id="todayWorkoutTitle">등 운동 💪</h2>
+          <p class="today-subtitle">오늘의 운동을 시작해보세요</p>
+          <div class="today-stats">
+            <span class="today-stat">5개 동작</span>
+            <span class="today-stat">4-5세트</span>
+            <span class="today-stat">~50분</span>
+          </div>
+          <span class="today-arrow">→</span>
+        </div>
+        
+        <h3 class="section-title"><span>📅</span> 주간 운동 스케줄</h3>
+        <div class="week-schedule" id="weekSchedule"></div>
+        
+        <h3 class="section-title"><span>🏃</span> 유산소 운동</h3>
+        <div class="cardio-home">
+          <div class="cardio-home-items">
+            <div class="cardio-home-item" onclick="openCardioDetail('bike')">
+              <div class="emoji">🚴</div>
+              <div class="name">실내자전거</div>
+              <div class="duration">30-60분</div>
+            </div>
+            <div class="cardio-home-item" onclick="openCardioDetail('treadmill')">
+              <div class="emoji">🏃‍♀️</div>
+              <div class="name">러닝머신</div>
+              <div class="duration">30-60분</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="stats-card">
+          <p class="stats-title">📊 이번 주 기록</p>
+          <div class="stats-row">
+            <div class="stat-item">
+              <p class="stat-value" id="weekWorkouts">0</p>
+              <p class="stat-label">완료 운동</p>
+            </div>
+            <div class="stat-item">
+              <p class="stat-value" id="weekSets">0</p>
+              <p class="stat-label">완료 세트</p>
+            </div>
+            <div class="stat-item">
+              <p class="stat-value" id="streakDays">0</p>
+              <p class="stat-label">연속 일수</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKOUT SCREEN -->
+    <div class="screen" id="workoutScreen">
+      <div class="workout-header">
+        <button class="back-btn" onclick="goHome()">← 홈으로</button>
+        <div class="workout-title-area">
+          <div>
+            <h1 class="workout-main-title" id="workoutTitle">등 운동</h1>
+            <p class="workout-date" id="workoutDate"></p>
+          </div>
+          <div class="workout-meta">
+            <p class="workout-meta-item"><strong>5</strong> 동작</p>
+            <p class="workout-meta-item"><strong>4-5</strong> 세트</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="progress-section">
+        <div class="progress-box">
+          <div class="progress-header">
+            <span class="progress-label">오늘의 진행률</span>
+            <span class="progress-count"><span id="completedCount">0</span>/5 완료</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="exercise-section">
+        <div class="exercise-list" id="exerciseList"></div>
+      </div>
+      
+      <div class="cardio-section">
+        <p class="cardio-title-row">🔥 유산소 운동 (근력 운동 후 권장)</p>
+        <div class="cardio-options">
+          <div class="cardio-option-card" id="cardio-bike" onclick="toggleCardioOption('bike')">
+            <div class="cardio-option-header">
+              <span class="cardio-option-icon">🚴</span>
+              <div>
+                <p class="cardio-option-name">실내자전거</p>
+                <p class="cardio-option-duration">30-60분</p>
+              </div>
+            </div>
+            <div class="cardio-option-details">
+              <div class="cardio-detail-item">
+                <p class="cardio-detail-label">권장 강도</p>
+                <p class="cardio-detail-value">숨이 약간 찰 정도 (RPE 5-7)</p>
+              </div>
+              <div class="cardio-detail-item">
+                <p class="cardio-detail-label">설정</p>
+                <p class="cardio-detail-value">저항 5-8단계 / RPM 70-90</p>
+              </div>
+              <div class="cardio-detail-item">
+                <p class="cardio-detail-label">💡 TIP</p>
+                <p class="cardio-detail-value">인터벌로 하면 효과 UP! 2분 빠르게 + 1분 천천히 반복</p>
+              </div>
+            </div>
+          </div>
+          <div class="cardio-option-card" id="cardio-treadmill" onclick="toggleCardioOption('treadmill')">
+            <div class="cardio-option-header">
+              <span class="cardio-option-icon">🏃‍♀️</span>
+              <div>
+                <p class="cardio-option-name">러닝머신</p>
+                <p class="cardio-option-duration">30-60분</p>
+              </div>
+            </div>
+            <div class="cardio-option-details">
+              <div class="cardio-detail-item">
+                <p class="cardio-detail-label">권장 강도</p>
+                <p class="cardio-detail-value">대화 가능한 정도 (RPE 5-7)</p>
+              </div>
+              <div class="cardio-detail-item">
+                <p class="cardio-detail-label">설정</p>
+                <p class="cardio-detail-value">경사 10-15% / 속도 5-6km/h</p>
+              </div>
+              <div class="cardio-detail-item">
+                <p class="cardio-detail-label">💡 TIP</p>
+                <p class="cardio-detail-value">경사 걷기가 관절에 부담 적고 칼로리 소모 높아요!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="complete-banner" id="completeBanner">
+        <span class="complete-emoji">🎉</span>
+        <h3 class="complete-title">오늘 운동 완료!</h3>
+        <p class="complete-desc">유산소도 잊지 마세요 💪</p>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <div class="nav-inner">
+        <div class="nav-item active" id="navHome" onclick="goHome()">
+          <div class="nav-icon">🏠</div>
+          <span class="nav-label">홈</span>
+        </div>
+        <div class="nav-item" id="navDay1" onclick="openWorkout(0)">
+          <div class="nav-icon">🦵</div>
+          <span class="nav-label">DAY1</span>
+        </div>
+        <div class="nav-item" id="navDay2" onclick="openWorkout(1)">
+          <div class="nav-icon">🔙</div>
+          <span class="nav-label">DAY2</span>
+        </div>
+        <div class="nav-item" id="navDay3" onclick="openWorkout(2)">
+          <div class="nav-icon">💪</div>
+          <span class="nav-label">DAY3</span>
+        </div>
+        <div class="nav-item" id="navDay4" onclick="openWorkout(3)">
+          <div class="nav-icon">🦵</div>
+          <span class="nav-label">DAY4</span>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // ===== EXERCISE SVG ILLUSTRATIONS =====
+    const exerciseSVGs = {
+      // 하체
+      squat: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="10" r="6"/><path d="M30 16v10M22 40l8-14 8 14M22 40v8M38 40v8M20 26h20"/></svg>`,
+      squatDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="22" r="12"/><path d="M70 34v18"/><path d="M50 52h40"/><path d="M55 75l15-23 15 23"/><path d="M55 75l-5 25"/><path d="M85 75l5 25"/><path d="M45 100l5-2"/><path d="M95 100l-5-2"/><ellipse cx="70" cy="60" rx="18" ry="8" class="muscle-highlight"/><text x="70" y="130" text-anchor="middle" fill="#00ff88" font-size="10">대퇴사두근 집중</text></svg>`,
+      
+      legPress: `<svg viewBox="0 0 60 60" class="exercise-svg"><rect x="5" y="35" width="50" height="4" rx="2"/><circle cx="20" cy="25" r="5"/><path d="M20 30v-2l15 10v5"/><path d="M35 43l15-8"/></svg>`,
+      legPressDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><rect x="10" y="70" width="120" height="8" rx="4"/><circle cx="45" cy="50" r="10"/><path d="M45 60v-5l25 18v10"/><path d="M70 83l40-15"/><ellipse cx="90" cy="75" rx="15" ry="6" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">무릎 90도 유지</text></svg>`,
+      
+      rdl: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="12" r="6"/><path d="M30 18l-5 22M30 18l5 22M25 40v10M35 40v10"/><rect x="20" y="48" width="20" height="4" rx="1"/></svg>`,
+      rdlDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="25" r="12"/><path d="M70 37l-10 40"/><path d="M70 37l10 40"/><path d="M60 77v20"/><path d="M80 77v20"/><rect x="45" y="95" width="50" height="8" rx="2"/><ellipse cx="70" cy="65" rx="12" ry="20" class="muscle-highlight"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">햄스트링 스트레칭</text></svg>`,
+      
+      legCurl: `<svg viewBox="0 0 60 60" class="exercise-svg"><rect x="10" y="25" width="40" height="6" rx="2"/><circle cx="20" cy="20" r="5"/><path d="M25 25c10 0 15 5 20 15"/><circle cx="47" cy="42" r="4"/></svg>`,
+      legCurlDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><rect x="15" y="50" width="90" height="12" rx="4"/><circle cx="40" cy="40" r="10"/><path d="M55 50c20 0 30 10 40 30"/><circle cx="100" cy="85" r="8"/><ellipse cx="75" cy="70" rx="20" ry="8" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">엉덩이 고정</text></svg>`,
+      
+      calfRaise: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="12" r="6"/><path d="M30 18v20M25 38v12M35 38v12"/><rect x="22" y="50" width="16" height="4" rx="1"/><path d="M22 54l4-4M38 54l-4-4"/></svg>`,
+      calfRaiseDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="25" r="12"/><path d="M70 37v35"/><path d="M60 72v25"/><path d="M80 72v25"/><rect x="50" y="97" width="40" height="8" rx="2"/><path d="M50 105l10-8M90 105l-10-8"/><ellipse cx="70" cy="90" rx="8" ry="15" class="muscle-highlight"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">최대 범위로</text></svg>`,
+      
+      // 등
+      latPulldown: `<svg viewBox="0 0 60 60" class="exercise-svg"><path d="M15 10h30"/><path d="M15 10v8M45 10v8"/><circle cx="30" cy="28" r="6"/><path d="M30 34v12M22 34l-7-16M38 34l7-16"/></svg>`,
+      latPulldownDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><path d="M25 15h90"/><path d="M25 15v15M115 15v15"/><circle cx="70" cy="55" r="12"/><path d="M70 67v25"/><path d="M55 67l-30-37M85 67l30-37"/><path class="muscle-highlight" d="M55 70c0 15 10 25 15 25s15-10 15-25"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">가슴을 펴고 당기기</text></svg>`,
+      
+      seatedRow: `<svg viewBox="0 0 60 60" class="exercise-svg"><rect x="5" y="30" width="20" height="8" rx="2"/><circle cx="35" cy="28" r="6"/><path d="M35 34v10M30 44h10"/><path d="M25 34h-15"/></svg>`,
+      seatedRowDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><rect x="10" y="60" width="40" height="15" rx="4"/><circle cx="85" cy="55" r="12"/><path d="M85 67v20"/><path d="M70 87h30"/><path d="M50 67H20"/><path class="muscle-highlight" d="M75 55c0 20 10 25 10 25s10-5 10-25"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">날개뼈 모으기</text></svg>`,
+      
+      dumbbellRow: `<svg viewBox="0 0 60 60" class="exercise-svg"><rect x="8" y="35" width="20" height="6" rx="2"/><circle cx="40" cy="25" r="5"/><path d="M40 30l-8 12"/><path d="M32 42v8"/><rect x="25" y="48" width="10" height="4" rx="1"/><path d="M38 35v10"/></svg>`,
+      dumbbellRowDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><rect x="15" y="70" width="45" height="12" rx="3"/><circle cx="95" cy="45" r="12"/><path d="M95 57l-20 25"/><path d="M75 82v18"/><rect x="60" y="100" width="25" height="8" rx="2"/><path d="M90 70v15"/><rect x="82" y="82" width="16" height="6" rx="2"/><path class="muscle-highlight" d="M85 55c5 10 15 15 15 20"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">팔꿈치를 천장으로</text></svg>`,
+      
+      facePull: `<svg viewBox="0 0 60 60" class="exercise-svg"><path d="M10 25h20"/><circle cx="40" cy="25" r="6"/><path d="M34 22l-24 3M34 28l-24-3"/><path d="M40 31v10"/></svg>`,
+      facePullDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><path d="M15 50h50"/><circle cx="90" cy="50" r="12"/><path d="M78 45l-48 5M78 55l-48-5"/><path d="M90 62v20"/><ellipse cx="90" cy="42" rx="15" ry="8" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">외회전하며 당기기</text></svg>`,
+      
+      backExtension: `<svg viewBox="0 0 60 60" class="exercise-svg"><ellipse cx="25" cy="40" rx="15" ry="8"/><circle cx="45" cy="25" r="5"/><path d="M40 28l-15 12"/><path d="M18 45l-5 10M32 45l5 10"/></svg>`,
+      backExtensionDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><ellipse cx="50" cy="80" rx="35" ry="15"/><circle cx="100" cy="45" r="12"/><path d="M88 50l-38 30"/><path d="M35 90l-10 20M65 90l10 20"/><path class="muscle-highlight" d="M60 60c10 5 25 10 35 0"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">과신전 주의</text></svg>`,
+      
+      // 어깨
+      overheadPress: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="15" r="6"/><path d="M30 21v15M20 10h20"/><path d="M20 10v8M40 10v8"/><path d="M25 36v12M35 36v12"/></svg>`,
+      overheadPressDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="30" r="12"/><path d="M70 42v25"/><path d="M40 15h60"/><path d="M40 15v18M100 15v18"/><path d="M60 67v25M80 67v25"/><ellipse cx="70" cy="35" rx="20" ry="8" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">코어 단단히</text></svg>`,
+      
+      lateralRaise: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="15" r="6"/><path d="M30 21v18"/><path d="M30 25l-18 8M30 25l18 8"/><rect x="8" y="31" width="8" height="4" rx="1"/><rect x="44" y="31" width="8" height="4" rx="1"/></svg>`,
+      lateralRaiseDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="30" r="12"/><path d="M70 42v35"/><path d="M70 50l-35 18M70 50l35 18"/><rect x="25" y="63" width="15" height="8" rx="2"/><rect x="100" y="63" width="15" height="8" rx="2"/><ellipse cx="45" cy="45" rx="8" ry="12" class="muscle-highlight"/><ellipse cx="95" cy="45" rx="8" ry="12" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">어깨 높이까지만</text></svg>`,
+      
+      frontRaise: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="15" r="6"/><path d="M30 21v18"/><path d="M28 26l-10-12M32 26l10-12"/><rect x="15" y="10" width="6" height="4" rx="1"/><rect x="39" y="10" width="6" height="4" rx="1"/></svg>`,
+      frontRaiseDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="35" r="12"/><path d="M70 47v30"/><path d="M65 55l-20-30M75 55l20-30"/><rect x="38" y="18" width="12" height="8" rx="2"/><rect x="90" y="18" width="12" height="8" rx="2"/><ellipse cx="55" cy="40" rx="10" ry="8" class="muscle-highlight"/><ellipse cx="85" cy="40" rx="10" ry="8" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">반동 없이 천천히</text></svg>`,
+      
+      rearDeltFly: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="20" r="5"/><path d="M30 25l-5 15M30 25l5 15"/><path d="M22 35l-12 5M38 35l12 5"/><rect x="6" y="38" width="6" height="4" rx="1"/><rect x="48" y="38" width="6" height="4" rx="1"/></svg>`,
+      rearDeltFlyDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="40" r="10"/><path d="M70 50l-12 30M70 50l12 30"/><path d="M52 70l-30 12M88 70l30 12"/><rect x="12" y="78" width="14" height="8" rx="2"/><rect x="114" y="78" width="14" height="8" rx="2"/><ellipse cx="50" cy="55" rx="12" ry="8" class="muscle-highlight"/><ellipse cx="90" cy="55" rx="12" ry="8" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">후면 삼각근 집중</text></svg>`,
+      
+      shrug: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="12" r="6"/><path d="M30 18v15"/><path d="M22 20v15M38 20v15"/><rect x="18" y="33" width="6" height="10" rx="1"/><rect x="36" y="33" width="6" height="10" rx="1"/></svg>`,
+      shrugDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="25" r="12"/><path d="M70 37v30"/><path d="M50 40v30M90 40v30"/><rect x="42" y="68" width="12" height="20" rx="2"/><rect x="86" y="68" width="12" height="20" rx="2"/><ellipse cx="55" cy="35" rx="12" ry="8" class="muscle-highlight"/><ellipse cx="85" cy="35" rx="12" ry="8" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">귀에 어깨 닿게</text></svg>`,
+      
+      // 추가 하체 운동
+      lunges: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="12" r="6"/><path d="M30 18v12"/><path d="M30 30l-12 18M30 30l8 18"/><path d="M18 48h8M38 48v8"/></svg>`,
+      lungesDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="25" r="12"/><path d="M70 37v25"/><path d="M70 62l-25 35M70 62l18 35"/><path d="M45 97h18M88 97v15"/><ellipse cx="55" cy="80" rx="12" ry="8" class="muscle-highlight"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">무릎 90도 유지</text></svg>`,
+      
+      legExtension: `<svg viewBox="0 0 60 60" class="exercise-svg"><rect x="10" y="25" width="25" height="8" rx="2"/><circle cx="25" cy="20" r="5"/><path d="M35 29l15-5"/><circle cx="52" cy="23" r="3"/></svg>`,
+      legExtensionDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><rect x="15" y="50" width="60" height="15" rx="4"/><circle cx="55" cy="40" r="10"/><path d="M75 57l35-12"/><circle cx="115" cy="43" r="8"/><ellipse cx="95" cy="50" rx="18" ry="8" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">대퇴사두근 수축</text></svg>`,
+      
+      hipThrust: `<svg viewBox="0 0 60 60" class="exercise-svg"><rect x="5" y="38" width="20" height="8" rx="2"/><circle cx="30" cy="25" r="5"/><path d="M25 38c0-8 10-8 10 0"/><path d="M35 38l10 8M25 38l-5 8"/></svg>`,
+      hipThrustDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><rect x="10" y="75" width="45" height="15" rx="4"/><circle cx="75" cy="50" r="10"/><path d="M55 75c0-20 30-20 30 0"/><path d="M85 75l25 18M55 75l-15 18"/><ellipse cx="70" cy="60" rx="20" ry="10" class="muscle-highlight"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">둔근 최대 수축</text></svg>`,
+      
+      // 추가 등 운동
+      pullUp: `<svg viewBox="0 0 60 60" class="exercise-svg"><path d="M15 8h30"/><circle cx="30" cy="20" r="5"/><path d="M30 25v15M22 15l8 5M38 15l-8 5"/><path d="M25 40v8M35 40v8"/></svg>`,
+      pullUpDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><path d="M25 15h90"/><circle cx="70" cy="40" r="12"/><path d="M70 52v30M50 30l20 10M90 30l-20 10"/><path d="M58 82v20M82 82v20"/><path class="muscle-highlight" d="M55 50c0 20 10 25 15 25s15-5 15-25"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">완전히 내려갔다 올라오기</text></svg>`,
+      
+      tBarRow: `<svg viewBox="0 0 60 60" class="exercise-svg"><path d="M10 45l35-20"/><circle cx="30" cy="22" r="5"/><path d="M30 27l-8 10"/><circle cx="12" cy="43" r="4"/></svg>`,
+      tBarRowDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><path d="M20 95l80-50"/><circle cx="75" cy="40" r="12"/><path d="M75 52l-20 25"/><circle cx="25" cy="90" r="10"/><path class="muscle-highlight" d="M65 50c5 15 20 20 20 25"/><text x="70" y="125" text-anchor="middle" fill="#00ff88" font-size="10">등 전체 자극</text></svg>`,
+      
+      // 추가 어깨 운동
+      arnoldPress: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="15" r="6"/><path d="M30 21v12"/><path d="M22 18c0 8 8 15 8 15M38 18c0 8-8 15-8 15"/><rect x="18" y="14" width="6" height="4" rx="1"/><rect x="36" y="14" width="6" height="4" rx="1"/></svg>`,
+      arnoldPressDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="30" r="12"/><path d="M70 42v20"/><path d="M50 38c0 18 20 30 20 30M90 38c0 18-20 30-20 30"/><rect x="42" y="30" width="12" height="8" rx="2"/><rect x="86" y="30" width="12" height="8" rx="2"/><ellipse cx="55" cy="35" rx="10" ry="8" class="muscle-highlight"/><ellipse cx="85" cy="35" rx="10" ry="8" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">회전하며 프레스</text></svg>`,
+      
+      uprightRow: `<svg viewBox="0 0 60 60" class="exercise-svg"><circle cx="30" cy="12" r="6"/><path d="M30 18v10"/><path d="M22 28v-10M38 28v-10"/><rect x="18" y="26" width="24" height="4" rx="1"/></svg>`,
+      uprightRowDetail: `<svg viewBox="0 0 140 140" class="exercise-svg-detail"><circle cx="70" cy="25" r="12"/><path d="M70 37v20"/><path d="M50 57v-22M90 57v-22"/><rect x="42" y="52" width="56" height="10" rx="3"/><ellipse cx="55" cy="35" rx="10" ry="8" class="muscle-highlight"/><ellipse cx="85" cy="35" rx="10" ry="8" class="muscle-highlight"/><text x="70" y="120" text-anchor="middle" fill="#00ff88" font-size="10">팔꿈치 높이 올리기</text></svg>`
+    };
+
+    // ===== 6일 운동 프로그램 =====
+    const weekProgram = [
+      {
+        day: 1,
+        dayName: "월",
+        name: "하체 A",
+        emoji: "🦵",
+        focus: "스쿼트 중심",
+        exercises: [
+          { id: 1, name: "바벨 스쿼트", nameEn: "Barbell Squat", sets: 5, reps: "15-20회", rest: "90초", target: "대퇴사두근, 둔근", svg: "squat", svgDetail: "squatDetail", instructions: ["바벨을 승모근 위에 올리고 어깨너비보다 넓게 발을 벌립니다", "가슴을 펴고 시선은 정면을 유지합니다", "엉덩이를 뒤로 빼며 무릎이 발끝을 넘지 않게 앉습니다", "허벅지가 바닥과 평행이 되면 발뒤꿈치로 밀며 일어납니다"], tip: "무릎이 안쪽으로 모이지 않게 바깥쪽으로 밀어주세요" },
+          { id: 2, name: "레그 프레스", nameEn: "Leg Press", sets: 4, reps: "15-20회", rest: "60초", target: "대퇴사두근", svg: "legPress", svgDetail: "legPressDetail", instructions: ["등과 엉덩이를 패드에 완전히 밀착시킵니다", "발을 어깨너비로 플랫폼 중앙에 위치시킵니다", "안전바를 풀고 무릎을 천천히 굽혀 내립니다", "무릎이 90도가 되면 발바닥 전체로 밀어 올립니다"], tip: "무릎을 완전히 펴지 말고 살짝 굽힌 상태를 유지하세요" },
+          { id: 3, name: "워킹 런지", nameEn: "Walking Lunges", sets: 4, reps: "좌우 각 15회", rest: "60초", target: "대퇴사두근, 둔근", svg: "lunges", svgDetail: "lungesDetail", instructions: ["덤벨을 양손에 들고 똑바로 섭니다", "한 발을 크게 앞으로 내딛습니다", "뒷무릎이 바닥에 닿기 직전까지 내려갑니다", "앞발로 밀어 일어나며 반대 발을 앞으로 내딛습니다"], tip: "상체가 앞으로 숙여지지 않게 가슴을 펴세요" },
+          { id: 4, name: "레그 익스텐션", nameEn: "Leg Extension", sets: 4, reps: "20회", rest: "45초", target: "대퇴사두근", svg: "legExtension", svgDetail: "legExtensionDetail", instructions: ["머신에 앉아 발목 패드를 정강이에 위치시킵니다", "손잡이를 잡고 상체를 고정합니다", "대퇴사두근 힘으로 다리를 완전히 폅니다", "최대 수축 후 천천히 내립니다"], tip: "마지막에 2초간 수축을 유지하면 효과 UP" },
+          { id: 5, name: "카프 레이즈", nameEn: "Calf Raise", sets: 4, reps: "20회", rest: "30초", target: "종아리", svg: "calfRaise", svgDetail: "calfRaiseDetail", instructions: ["스미스 머신이나 레그프레스에서 앞꿈치만 플랫폼에 올립니다", "발뒤꿈치를 최대한 낮춰 종아리를 스트레칭합니다", "앞꿈치로 밀어 발뒤꿈치를 최대한 들어올립니다", "2초간 수축을 유지한 후 천천히 내립니다"], tip: "동작 범위를 최대한 크게 하면 효과가 좋아요" }
+        ]
+      },
+      {
+        day: 2,
+        dayName: "화",
+        name: "등 A",
+        emoji: "🔙",
+        focus: "광배근 중심",
+        exercises: [
+          { id: 1, name: "랫 풀다운", nameEn: "Lat Pulldown", sets: 4, reps: "15-20회", rest: "60초", target: "광배근", svg: "latPulldown", svgDetail: "latPulldownDetail", instructions: ["바를 어깨너비보다 넓게 잡고 앉습니다", "가슴을 펴고 어깨를 뒤로 당기며 바를 쇄골 쪽으로 내립니다", "등 근육의 수축을 느끼며 2초간 유지합니다", "천천히 팔을 펴며 시작 자세로 돌아갑니다"], tip: "팔꿈치를 몸 뒤쪽으로 당긴다는 느낌으로 수행하세요" },
+          { id: 2, name: "시티드 로우", nameEn: "Seated Cable Row", sets: 4, reps: "15-20회", rest: "60초", target: "중앙 등근육", svg: "seatedRow", svgDetail: "seatedRowDetail", instructions: ["케이블 머신에 앉아 발을 패드에 고정합니다", "허리를 곧게 펴고 핸들을 잡습니다", "팔꿈치를 몸 옆으로 당기며 복부 쪽으로 끌어옵니다", "날개뼈를 모으며 2초간 수축 후 천천히 돌아갑니다"], tip: "상체가 앞뒤로 흔들리지 않게 코어에 힘을 주세요" },
+          { id: 3, name: "덤벨 원암 로우", nameEn: "One-Arm Dumbbell Row", sets: 5, reps: "좌우 각 15회", rest: "45초", target: "광배근, 능형근", svg: "dumbbellRow", svgDetail: "dumbbellRowDetail", instructions: ["벤치에 한 손과 무릎을 대고 반대쪽 발은 바닥에 고정합니다", "덤벨을 든 팔을 아래로 늘어뜨립니다", "팔꿈치를 천장 방향으로 당기며 옆구리까지 끌어올립니다", "등 근육 수축을 느끼고 천천히 내립니다"], tip: "덤벨을 들어올릴 때 어깨가 올라가지 않도록 주의하세요" },
+          { id: 4, name: "페이스 풀", nameEn: "Face Pull", sets: 4, reps: "20회", rest: "45초", target: "후면 삼각근, 승모근", svg: "facePull", svgDetail: "facePullDetail", instructions: ["케이블을 얼굴 높이로 설정하고 로프를 잡습니다", "한 발을 앞으로 내딛어 안정적인 자세를 잡습니다", "로프를 얼굴 양옆으로 당기며 외회전합니다", "어깨 후면과 등 상부의 수축을 느끼며 돌아갑니다"], tip: "팔꿈치가 어깨보다 높게 유지되도록 하세요" },
+          { id: 5, name: "백 익스텐션", nameEn: "Back Extension", sets: 4, reps: "15-20회", rest: "45초", target: "척추기립근", svg: "backExtension", svgDetail: "backExtensionDetail", instructions: ["백 익스텐션 머신에 엉덩이를 패드에 대고 엎드립니다", "손은 가슴 앞에 X자로 모읍니다", "허리 힘으로 상체를 들어올려 몸이 일직선이 되게 합니다", "과하게 젖히지 말고 천천히 내려갑니다"], tip: "동작 속도를 천천히 하면 효과가 배가됩니다" }
+        ]
+      },
+      {
+        day: 3,
+        dayName: "수",
+        name: "어깨 A",
+        emoji: "💪",
+        focus: "전면/측면 삼각근",
+        exercises: [
+          { id: 1, name: "오버헤드 프레스", nameEn: "Overhead Press", sets: 4, reps: "15-20회", rest: "60초", target: "전면 삼각근", svg: "overheadPress", svgDetail: "overheadPressDetail", instructions: ["바벨을 쇄골 앞에 위치시키고 어깨너비로 잡습니다", "코어에 힘을 주고 가슴을 펴줍니다", "바벨을 머리 위로 밀어올립니다", "팔꿈치가 완전히 펴지면 천천히 내립니다"], tip: "허리가 과하게 젖혀지지 않게 복부에 힘을 유지하세요" },
+          { id: 2, name: "사이드 레터럴 레이즈", nameEn: "Side Lateral Raise", sets: 5, reps: "15-20회", rest: "45초", target: "측면 삼각근", svg: "lateralRaise", svgDetail: "lateralRaiseDetail", instructions: ["덤벨을 양손에 들고 몸 옆에 위치시킵니다", "팔꿈치를 살짝 굽힌 상태를 유지합니다", "어깨 높이까지 양팔을 옆으로 들어올립니다", "천천히 내리며 긴장을 유지합니다"], tip: "새끼손가락이 위로 향하게 들면 측면 자극이 커져요" },
+          { id: 3, name: "프론트 레이즈", nameEn: "Front Raise", sets: 4, reps: "15회", rest: "45초", target: "전면 삼각근", svg: "frontRaise", svgDetail: "frontRaiseDetail", instructions: ["덤벨을 허벅지 앞에 들고 섭니다", "팔꿈치를 살짝 굽힌 상태로 유지합니다", "한 팔씩 또는 양팔을 동시에 어깨 높이까지 들어올립니다", "천천히 내리며 반복합니다"], tip: "반동을 쓰지 말고 어깨 힘만으로 들어올리세요" },
+          { id: 4, name: "리어 델트 플라이", nameEn: "Rear Delt Fly", sets: 4, reps: "20회", rest: "45초", target: "후면 삼각근", svg: "rearDeltFly", svgDetail: "rearDeltFlyDetail", instructions: ["벤치에 엎드리거나 상체를 숙이고 덤벨을 잡습니다", "팔꿈치를 살짝 굽히고 덤벨을 아래로 늘어뜨립니다", "어깨 후면 힘으로 양팔을 옆으로 벌립니다", "날개뼈를 모으며 수축 후 천천히 내립니다"], tip: "등 근육이 아닌 어깨 후면에 집중하세요" },
+          { id: 5, name: "슈러그", nameEn: "Shrug", sets: 4, reps: "15-20회", rest: "45초", target: "승모근", svg: "shrug", svgDetail: "shrugDetail", instructions: ["덤벨이나 바벨을 몸 옆에 들고 섭니다", "팔을 펴고 어깨만 으쓱 올립니다", "귀에 어깨가 닿는다는 느낌으로 최대한 올립니다", "2초간 수축 후 천천히 내립니다"], tip: "어깨를 돌리지 말고 위아래로만 움직이세요" }
+        ]
+      },
+      {
+        day: 4,
+        dayName: "목",
+        name: "하체 B",
+        emoji: "🦵",
+        focus: "햄스트링/둔근 중심",
+        exercises: [
+          { id: 1, name: "루마니안 데드리프트", nameEn: "Romanian Deadlift", sets: 5, reps: "15회", rest: "90초", target: "햄스트링, 둔근", svg: "rdl", svgDetail: "rdlDetail", instructions: ["바벨을 어깨너비로 잡고 무릎을 살짝 굽힙니다", "허리를 곧게 유지하며 엉덩이를 뒤로 밀어냅니다", "햄스트링이 당기는 느낌이 들 때까지 상체를 숙입니다", "둔근에 힘을 주며 엉덩이를 앞으로 밀어 일어납니다"], tip: "바벨이 몸에서 떨어지지 않게 다리를 따라 내리세요" },
+          { id: 2, name: "힙 쓰러스트", nameEn: "Hip Thrust", sets: 4, reps: "15-20회", rest: "60초", target: "둔근", svg: "hipThrust", svgDetail: "hipThrustDetail", instructions: ["벤치에 등 상부를 대고 바벨을 골반 위에 올립니다", "발은 어깨너비로 바닥에 고정합니다", "둔근 힘으로 엉덩이를 천장으로 밀어 올립니다", "몸이 일직선이 되면 2초간 유지 후 내립니다"], tip: "턱을 당기고 시선은 앞을 보세요" },
+          { id: 3, name: "불가리안 스플릿 스쿼트", nameEn: "Bulgarian Split Squat", sets: 4, reps: "좌우 각 15회", rest: "60초", target: "대퇴사두근, 둔근", svg: "lunges", svgDetail: "lungesDetail", instructions: ["뒤에 있는 벤치에 한 발을 올립니다", "앞발에 체중을 싣고 천천히 내려갑니다", "앞무릎이 90도가 될 때까지 내려갑니다", "앞발 뒤꿈치로 밀며 일어납니다"], tip: "상체가 앞으로 쏠리지 않게 곧게 유지하세요" },
+          { id: 4, name: "레그 컬", nameEn: "Leg Curl", sets: 4, reps: "20회", rest: "45초", target: "햄스트링", svg: "legCurl", svgDetail: "legCurlDetail", instructions: ["머신에 엎드려 발목 패드를 아킬레스건 위에 위치시킵니다", "손잡이를 잡고 상체를 고정합니다", "햄스트링 힘으로 발뒤꿈치를 엉덩이 쪽으로 당깁니다", "최대 수축 후 천천히 내립니다"], tip: "엉덩이가 들리지 않게 복부에 힘을 주세요" },
+          { id: 5, name: "카프 레이즈", nameEn: "Calf Raise", sets: 4, reps: "20회", rest: "30초", target: "종아리", svg: "calfRaise", svgDetail: "calfRaiseDetail", instructions: ["스미스 머신이나 레그프레스에서 앞꿈치만 플랫폼에 올립니다", "발뒤꿈치를 최대한 낮춰 종아리를 스트레칭합니다", "앞꿈치로 밀어 발뒤꿈치를 최대한 들어올립니다", "2초간 수축을 유지한 후 천천히 내립니다"], tip: "동작 범위를 최대한 크게 하면 효과가 좋아요" }
+        ]
+      },
+      {
+        day: 5,
+        dayName: "금",
+        name: "등 B",
+        emoji: "🔙",
+        focus: "전체 등근육",
+        exercises: [
+          { id: 1, name: "풀업/어시스트 풀업", nameEn: "Pull Up", sets: 4, reps: "최대 반복", rest: "90초", target: "광배근, 이두", svg: "pullUp", svgDetail: "pullUpDetail", instructions: ["바를 어깨너비보다 약간 넓게 잡습니다", "어깨를 아래로 내리고 가슴을 펴줍니다", "팔꿈치를 옆구리 쪽으로 당기며 올라갑니다", "턱이 바 위로 올라가면 천천히 내려옵니다"], tip: "어렵다면 어시스트 머신이나 밴드를 활용하세요" },
+          { id: 2, name: "티바 로우", nameEn: "T-Bar Row", sets: 4, reps: "15-20회", rest: "60초", target: "중앙 등근육, 광배근", svg: "tBarRow", svgDetail: "tBarRowDetail", instructions: ["바벨 한쪽을 코너에 고정하고 핸들을 잡습니다", "무릎을 살짝 굽히고 상체를 45도로 숙입니다", "팔꿈치를 몸 옆으로 당기며 가슴 쪽으로 끌어올립니다", "등 수축을 느끼고 천천히 내립니다"], tip: "허리가 둥글어지지 않게 주의하세요" },
+          { id: 3, name: "덤벨 원암 로우", nameEn: "One-Arm Dumbbell Row", sets: 5, reps: "좌우 각 15회", rest: "45초", target: "광배근, 능형근", svg: "dumbbellRow", svgDetail: "dumbbellRowDetail", instructions: ["벤치에 한 손과 무릎을 대고 반대쪽 발은 바닥에 고정합니다", "덤벨을 든 팔을 아래로 늘어뜨립니다", "팔꿈치를 천장 방향으로 당기며 옆구리까지 끌어올립니다", "등 근육 수축을 느끼고 천천히 내립니다"], tip: "덤벨을 들어올릴 때 어깨가 올라가지 않도록 주의하세요" },
+          { id: 4, name: "랫 풀다운 (언더그립)", nameEn: "Underhand Lat Pulldown", sets: 4, reps: "15-20회", rest: "45초", target: "광배근 하부", svg: "latPulldown", svgDetail: "latPulldownDetail", instructions: ["바를 어깨너비로 역수로 (손바닥이 나를 향하게) 잡습니다", "가슴을 펴고 바를 쇄골 쪽으로 당깁니다", "광배근 하부의 수축을 느낍니다", "천천히 팔을 펴며 돌아갑니다"], tip: "이두에 힘이 들어가지 않게 등으로 당기세요" },
+          { id: 5, name: "백 익스텐션", nameEn: "Back Extension", sets: 4, reps: "15-20회", rest: "45초", target: "척추기립근", svg: "backExtension", svgDetail: "backExtensionDetail", instructions: ["백 익스텐션 머신에 엉덩이를 패드에 대고 엎드립니다", "손은 가슴 앞에 X자로 모읍니다", "허리 힘으로 상체를 들어올려 몸이 일직선이 되게 합니다", "과하게 젖히지 말고 천천히 내려갑니다"], tip: "동작 속도를 천천히 하면 효과가 배가됩니다" }
+        ]
+      },
+      {
+        day: 6,
+        dayName: "토",
+        name: "어깨 B",
+        emoji: "💪",
+        focus: "전체 삼각근 + 승모근",
+        exercises: [
+          { id: 1, name: "아놀드 프레스", nameEn: "Arnold Press", sets: 4, reps: "15회", rest: "60초", target: "전체 삼각근", svg: "arnoldPress", svgDetail: "arnoldPressDetail", instructions: ["덤벨을 어깨 앞에 손바닥이 나를 향하게 들어올립니다", "팔을 회전시키며 위로 밀어올립니다", "손바닥이 앞을 향할 때 완전히 펴집니다", "역순으로 돌아오며 내립니다"], tip: "회전과 프레스를 부드럽게 연결하세요" },
+          { id: 2, name: "사이드 레터럴 레이즈", nameEn: "Side Lateral Raise", sets: 5, reps: "15-20회", rest: "45초", target: "측면 삼각근", svg: "lateralRaise", svgDetail: "lateralRaiseDetail", instructions: ["덤벨을 양손에 들고 몸 옆에 위치시킵니다", "팔꿈치를 살짝 굽힌 상태를 유지합니다", "어깨 높이까지 양팔을 옆으로 들어올립니다", "천천히 내리며 긴장을 유지합니다"], tip: "새끼손가락이 위로 향하게 들면 측면 자극이 커져요" },
+          { id: 3, name: "업라이트 로우", nameEn: "Upright Row", sets: 4, reps: "15회", rest: "45초", target: "측면 삼각근, 승모근", svg: "uprightRow", svgDetail: "uprightRowDetail", instructions: ["바벨이나 덤벨을 어깨너비보다 좁게 잡습니다", "팔꿈치를 바깥쪽으로 들어올립니다", "바벨이 턱 높이까지 올라오면 멈춥니다", "천천히 내립니다"], tip: "팔꿈치가 손목보다 항상 높게 유지하세요" },
+          { id: 4, name: "리어 델트 플라이", nameEn: "Rear Delt Fly", sets: 4, reps: "20회", rest: "45초", target: "후면 삼각근", svg: "rearDeltFly", svgDetail: "rearDeltFlyDetail", instructions: ["벤치에 엎드리거나 상체를 숙이고 덤벨을 잡습니다", "팔꿈치를 살짝 굽히고 덤벨을 아래로 늘어뜨립니다", "어깨 후면 힘으로 양팔을 옆으로 벌립니다", "날개뼈를 모으며 수축 후 천천히 내립니다"], tip: "등 근육이 아닌 어깨 후면에 집중하세요" },
+          { id: 5, name: "페이스 풀", nameEn: "Face Pull", sets: 4, reps: "20회", rest: "45초", target: "후면 삼각근, 승모근", svg: "facePull", svgDetail: "facePullDetail", instructions: ["케이블을 얼굴 높이로 설정하고 로프를 잡습니다", "한 발을 앞으로 내딛어 안정적인 자세를 잡습니다", "로프를 얼굴 양옆으로 당기며 외회전합니다", "어깨 후면과 등 상부의 수축을 느끼며 돌아갑니다"], tip: "어깨 건강에 매우 좋은 운동이에요!" }
+        ]
+      }
+    ];
+
+    // ===== STATE =====
+    let currentDayIndex = 0;
+    let completedExercises = {};
+    
+    // ===== FUNCTIONS =====
+    function updateGreeting() {
+      const hour = new Date().getHours();
+      const el = document.getElementById('greeting');
+      if (hour < 12) el.textContent = '좋은 아침이에요 ☀️';
+      else if (hour < 18) el.textContent = '좋은 오후예요 🌤️';
+      else el.textContent = '좋은 저녁이에요 🌙';
+    }
+    
+    function getTodayDayIndex() {
+      const day = new Date().getDay();
+      // 일=0, 월=1, ..., 토=6
+      // 월~토 = 0~5 인덱스
+      if (day === 0) return -1; // 일요일은 휴식
+      return day - 1;
+    }
+    
+    function renderWeekSchedule() {
+      const todayIdx = getTodayDayIndex();
+      const container = document.getElementById('weekSchedule');
+      
+      let html = '';
+      weekProgram.forEach((program, idx) => {
+        const isToday = idx === todayIdx;
+        html += `
+          <div class="day-card ${isToday ? 'today' : ''}" onclick="openWorkout(${idx})">
+            <p class="day-label">DAY ${program.day} (${program.dayName})</p>
+            <span class="day-emoji">${program.emoji}</span>
+            <p class="day-name">${program.name}</p>
+            ${isToday ? '<span class="day-today-badge">TODAY</span>' : ''}
+          </div>
+        `;
+      });
+      
+      // 일요일 휴식
+      html += `
+        <div class="day-card rest">
+          <p class="day-label">DAY 7 (일)</p>
+          <span class="day-emoji">😴</span>
+          <p class="day-name">휴식</p>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+    }
+    
+    function updateTodayCard() {
+      const todayIdx = getTodayDayIndex();
+      const titleEl = document.getElementById('todayWorkoutTitle');
+      
+      if (todayIdx === -1) {
+        titleEl.textContent = '오늘은 휴식일 😴';
+      } else {
+        const program = weekProgram[todayIdx];
+        titleEl.textContent = `${program.name} ${program.emoji}`;
+      }
+    }
+    
+    function openTodayWorkout() {
+      const todayIdx = getTodayDayIndex();
+      if (todayIdx === -1) {
+        alert('오늘은 휴식일이에요! 내일 다시 화이팅 💪');
+        return;
+      }
+      openWorkout(todayIdx);
+    }
+    
+    function openWorkout(dayIndex) {
+      currentDayIndex = dayIndex;
+      const program = weekProgram[dayIndex];
+      
+      if (!completedExercises[dayIndex]) {
+        completedExercises[dayIndex] = [];
+      }
+      
+      document.getElementById('workoutTitle').textContent = `DAY${program.day} ${program.name}`;
+      
+      const now = new Date();
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      document.getElementById('workoutDate').textContent = 
+        `${now.getMonth() + 1}월 ${now.getDate()}일 ${days[now.getDay()]}요일 · ${program.focus}`;
+      
+      renderExercises();
+      updateProgress();
+      
+      document.getElementById('homeScreen').classList.remove('active');
+      document.getElementById('workoutScreen').classList.add('active', 'slide-in');
+      
+      updateNav(dayIndex);
+    }
+    
+    function goHome() {
+      document.getElementById('workoutScreen').classList.remove('active', 'slide-in');
+      document.getElementById('homeScreen').classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.getElementById('navHome').classList.add('active');
+      updateStats();
+    }
+    
+    function updateNav(dayIndex) {
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const navId = `navDay${dayIndex + 1}`;
+      const navEl = document.getElementById(navId);
+      if (navEl) navEl.classList.add('active');
+    }
+    
+    function renderExercises() {
+      const program = weekProgram[currentDayIndex];
+      const completed = completedExercises[currentDayIndex] || [];
+      const list = document.getElementById('exerciseList');
+      
+      list.innerHTML = program.exercises.map((ex, idx) => `
+        <div class="exercise-card ${completed.includes(ex.id) ? 'completed' : ''}" 
+             data-id="${ex.id}" 
+             onclick="toggleExerciseDetails(${ex.id})"
+             style="animation: slideUp 0.4s ease ${idx * 0.08}s both;">
+          <div class="exercise-main">
+            <div class="exercise-illustration">
+              ${exerciseSVGs[ex.svg] || ''}
+            </div>
+            <div class="exercise-info">
+              <p class="exercise-name">${ex.name}</p>
+              <p class="exercise-name-en">${ex.nameEn}</p>
+              <div class="exercise-tags">
+                <span class="tag tag-sets">${ex.sets}세트</span>
+                <span class="tag tag-reps">${ex.reps}</span>
+                <span class="tag tag-rest">휴식 ${ex.rest}</span>
+              </div>
+            </div>
+            <button class="check-btn ${completed.includes(ex.id) ? 'checked' : ''}" 
+                    onclick="toggleComplete(${ex.id}, event)">
+              ${completed.includes(ex.id) ? '✓' : '○'}
+            </button>
+          </div>
+          <div class="exercise-details">
+            <div class="detail-illustration">
+              ${exerciseSVGs[ex.svgDetail] || exerciseSVGs[ex.svg] || ''}
+            </div>
+            <p class="detail-label">타겟 근육</p>
+            <p class="detail-value">${ex.target}</p>
+            <p class="detail-label">수행 방법</p>
+            <ol class="instructions">
+              ${ex.instructions.map((inst, i) => `
+                <li class="instruction-item">
+                  <span class="instruction-num">${i + 1}</span>
+                  <span class="instruction-text">${inst}</span>
+                </li>
+              `).join('')}
+            </ol>
+            <div class="tip-box">
+              <span class="tip-label">💡 TIP</span>
+              <p class="tip-text">${ex.tip}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function toggleExerciseDetails(id) {
+      const card = document.querySelector(`.exercise-card[data-id="${id}"]`);
+      const wasExpanded = card.classList.contains('expanded');
+      document.querySelectorAll('.exercise-card').forEach(c => c.classList.remove('expanded'));
+      if (!wasExpanded) card.classList.add('expanded');
+    }
+    
+    function toggleComplete(id, event) {
+      event.stopPropagation();
+      
+      if (!completedExercises[currentDayIndex]) {
+        completedExercises[currentDayIndex] = [];
+      }
+      
+      const completed = completedExercises[currentDayIndex];
+      const idx = completed.indexOf(id);
+      
+      if (idx > -1) completed.splice(idx, 1);
+      else completed.push(id);
+      
+      const card = document.querySelector(`.exercise-card[data-id="${id}"]`);
+      const btn = card.querySelector('.check-btn');
+      
+      if (completed.includes(id)) {
+        card.classList.add('completed');
+        btn.classList.add('checked');
+        btn.textContent = '✓';
+      } else {
+        card.classList.remove('completed');
+        btn.classList.remove('checked');
+        btn.textContent = '○';
+      }
+      
+      updateProgress();
+    }
+    
+    function updateProgress() {
+      const program = weekProgram[currentDayIndex];
+      const completed = completedExercises[currentDayIndex] || [];
+      const total = program.exercises.length;
+      const count = completed.length;
+      
+      document.getElementById('completedCount').textContent = count;
+      document.getElementById('progressFill').style.width = `${(count / total) * 100}%`;
+      
+      const banner = document.getElementById('completeBanner');
+      if (count === total) banner.classList.add('show');
+      else banner.classList.remove('show');
+    }
+    
+    function toggleCardioOption(type) {
+      const card = document.getElementById(`cardio-${type}`);
+      const wasExpanded = card.classList.contains('expanded');
+      document.querySelectorAll('.cardio-option-card').forEach(c => c.classList.remove('expanded'));
+      if (!wasExpanded) card.classList.add('expanded');
+    }
+    
+    function openCardioDetail(type) {
+      // 홈에서 유산소 클릭 시 - 간단한 alert 또는 모달
+      const info = {
+        bike: {
+          name: '실내자전거',
+          duration: '30-60분',
+          intensity: '숨이 약간 찰 정도 (RPE 5-7)',
+          settings: '저항 5-8단계 / RPM 70-90',
+          tip: '인터벌: 2분 빠르게 + 1분 천천히 반복'
+        },
+        treadmill: {
+          name: '러닝머신',
+          duration: '30-60분',
+          intensity: '대화 가능한 정도 (RPE 5-7)',
+          settings: '경사 10-15% / 속도 5-6km/h',
+          tip: '경사 걷기가 관절에 부담 적고 칼로리 소모 높아요!'
+        }
+      };
+      
+      const data = info[type];
+      alert(`🏃 ${data.name}\n\n⏱ ${data.duration}\n💪 ${data.intensity}\n⚙️ ${data.settings}\n\n💡 ${data.tip}`);
+    }
+    
+    function updateStats() {
+      let totalCompleted = 0;
+      let workoutsCompleted = 0;
+      
+      Object.values(completedExercises).forEach((arr, idx) => {
+        totalCompleted += arr.length;
+        if (arr.length === 5) workoutsCompleted++;
+      });
+      
+      document.getElementById('weekWorkouts').textContent = workoutsCompleted;
+      document.getElementById('weekSets').textContent = totalCompleted * 4; // 평균 4세트
+      document.getElementById('streakDays').textContent = workoutsCompleted;
+    }
+    
+    // ===== INIT =====
+    updateGreeting();
+    renderWeekSchedule();
+    updateTodayCard();
+    updateStats();
+  </script>
+</body>
+</html>
