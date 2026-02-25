@@ -463,6 +463,166 @@
     .exercise-svg { fill: none; stroke: #00ff88; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .exercise-svg-detail { fill: none; stroke: #00ff88; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
     .muscle-highlight { fill: rgba(0,255,136,0.2); stroke: #00ff88; }
+
+    /* ===== WORKOUT CARD STYLE ===== */
+    .wc-session-header {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 16px 20px;
+      margin: 0 20px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .wc-session-title { font-size: 17px; font-weight: 700; }
+    .wc-duration-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,0.08);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+    .wc-exercise-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin: 0 20px 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .wc-exercise-item:active { transform: scale(0.98); }
+    .wc-exercise-item.completed {
+      background: rgba(0,255,136,0.07);
+      border-color: rgba(0,255,136,0.25);
+    }
+    .wc-exercise-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .wc-exercise-icon .exercise-svg { width: 30px; height: 30px; }
+    .wc-exercise-info { flex: 1; min-width: 0; }
+    .wc-exercise-name { font-size: 15px; font-weight: 600; }
+    .wc-exercise-name-en { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+    .wc-exercise-detail { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .wc-tag { background: rgba(255,255,255,0.08); border-radius: 6px; padding: 2px 7px; font-size: 11px; }
+    .wc-check-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: rgba(255,255,255,0.4);
+      font-size: 15px;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .wc-check-btn.checked { background: #00ff88; border-color: #00ff88; color: #000; font-weight: 700; }
+    .wc-expand-area {
+      display: none;
+      padding: 12px 20px 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin: 10px -16px -14px;
+    }
+    .wc-exercise-item.expanded .wc-expand-area { display: block; }
+
+    /* ===== ADMIN PAGE ===== */
+    #adminScreen { padding-bottom: 100px; }
+    .admin-header {
+      padding: 50px 24px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .admin-title { font-size: 22px; font-weight: 800; }
+    .admin-title span { color: #00ff88; }
+    .admin-subtitle { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+    .admin-refresh-btn {
+      background: rgba(0,255,136,0.1);
+      border: 1px solid rgba(0,255,136,0.3);
+      color: #00ff88;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 8px;
+    }
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 0 20px 20px;
+    }
+    .admin-stat-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+      text-align: center;
+    }
+    .admin-stat-value { font-size: 28px; font-weight: 800; color: #00ff88; }
+    .admin-stat-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .admin-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 1.5px;
+      padding: 0 20px;
+      margin-bottom: 12px;
+    }
+    .admin-date-group { margin-bottom: 20px; }
+    .admin-date-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #00ff88;
+      padding: 0 20px;
+      margin-bottom: 8px;
+    }
+    .admin-log-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin: 0 20px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .admin-log-exercise { font-size: 14px; font-weight: 600; }
+    .admin-log-day { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .admin-log-time { font-size: 11px; color: rgba(255,255,255,0.4); text-align: right; }
+    .admin-log-user {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.06);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-family: monospace;
+      margin-top: 3px;
+      text-align: right;
+    }
+    .admin-empty { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.3); font-size: 14px; }
+    .admin-loading { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.4); }
   </style>
 </head>
 <body>
@@ -471,7 +631,7 @@
     <div class="screen active" id="homeScreen">
       <div class="home-header">
         <p class="greeting" id="greeting">좋은 아침이에요 ☀️</p>
-        <h1 class="home-title">오늘도 <span>열심히</span><br>운동해볼까요?</h1>
+        <h1 class="home-title" onclick="handleAdminTap()">오늘도 <span>열심히</span><br>운동해볼까요?</h1>
       </div>
       
       <div class="home-content">
@@ -617,6 +777,39 @@
       </div>
     </div>
 
+    <!-- Admin Screen -->
+    <div class="screen" id="adminScreen">
+      <div class="admin-header">
+        <div>
+          <p class="admin-subtitle">ADMIN DASHBOARD</p>
+          <h1 class="admin-title">운동 <span>기록</span> 관리</h1>
+        </div>
+        <button class="admin-refresh-btn" onclick="loadAdminLogs()">↻ 새로고침</button>
+      </div>
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-value" id="adminTodayLogs">-</div>
+          <div class="admin-stat-label">오늘 완료</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-value" id="adminActiveUsers">-</div>
+          <div class="admin-stat-label">오늘 유저</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-value" id="adminWeekLogs">-</div>
+          <div class="admin-stat-label">이번주 완료</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-value" id="adminTotalUsers">-</div>
+          <div class="admin-stat-label">전체 유저</div>
+        </div>
+      </div>
+      <p class="admin-section-title">최근 운동 기록</p>
+      <div id="adminLogsList">
+        <div class="admin-loading">데이터 불러오는 중...</div>
+      </div>
+    </div>
+
     <!-- Bottom Nav -->
     <nav class="bottom-nav">
       <div class="nav-inner">
@@ -674,6 +867,110 @@
         completed_exercises: completedExercises,
         updated_at: new Date().toISOString()
       }, { onConflict: 'device_id' });
+    }
+
+    async function logExercise(exerciseId, exerciseName, dayIndex) {
+      const today = new Date().toISOString().split('T')[0];
+      await db.from('workout_logs').upsert({
+        device_id: getDeviceId(),
+        workout_date: today,
+        day_index: dayIndex,
+        exercise_id: exerciseId,
+        exercise_name: exerciseName,
+        completed_at: new Date().toISOString()
+      }, { onConflict: 'device_id,workout_date,day_index,exercise_id' });
+    }
+
+    async function unlogExercise(exerciseId, dayIndex) {
+      const today = new Date().toISOString().split('T')[0];
+      await db.from('workout_logs')
+        .delete()
+        .eq('device_id', getDeviceId())
+        .eq('workout_date', today)
+        .eq('day_index', dayIndex)
+        .eq('exercise_id', exerciseId);
+    }
+
+    // ===== ADMIN =====
+    let adminTapCount = 0;
+    let adminTapTimer = null;
+
+    function handleAdminTap() {
+      adminTapCount++;
+      if (adminTapTimer) clearTimeout(adminTapTimer);
+      adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 2000);
+      if (adminTapCount >= 5) {
+        adminTapCount = 0;
+        const pw = prompt('관리자 비밀번호:');
+        if (pw === '0000') openAdmin();
+      }
+    }
+
+    function openAdmin() {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'slide-in'));
+      document.getElementById('adminScreen').classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      loadAdminLogs();
+    }
+
+    async function loadAdminLogs() {
+      document.getElementById('adminLogsList').innerHTML = '<div class="admin-loading">불러오는 중...</div>';
+      const today = new Date().toISOString().split('T')[0];
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      const { data: logs } = await db
+        .from('workout_logs')
+        .select('*')
+        .order('completed_at', { ascending: false })
+        .limit(300);
+
+      if (!logs) {
+        document.getElementById('adminLogsList').innerHTML = '<div class="admin-empty">데이터를 불러올 수 없습니다.</div>';
+        return;
+      }
+
+      const todayLogs = logs.filter(l => l.workout_date === today);
+      const weekLogs = logs.filter(l => l.workout_date >= weekAgo);
+      const todayUsers = new Set(todayLogs.map(l => l.device_id)).size;
+      const totalUsers = new Set(logs.map(l => l.device_id)).size;
+
+      document.getElementById('adminTodayLogs').textContent = todayLogs.length;
+      document.getElementById('adminActiveUsers').textContent = todayUsers;
+      document.getElementById('adminWeekLogs').textContent = weekLogs.length;
+      document.getElementById('adminTotalUsers').textContent = totalUsers;
+
+      if (logs.length === 0) {
+        document.getElementById('adminLogsList').innerHTML = '<div class="admin-empty">아직 기록이 없습니다 💪</div>';
+        return;
+      }
+
+      const grouped = {};
+      logs.forEach(log => {
+        if (!grouped[log.workout_date]) grouped[log.workout_date] = [];
+        grouped[log.workout_date].push(log);
+      });
+
+      let html = '';
+      Object.entries(grouped).forEach(([date, items]) => {
+        html += `<div class="admin-date-group"><div class="admin-date-label">📅 ${date}</div>`;
+        items.forEach(item => {
+          const time = new Date(item.completed_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+          const dayName = weekProgram[item.day_index]?.name || ('DAY' + (item.day_index + 1));
+          const userId = item.device_id.substring(0, 8) + '…';
+          html += `<div class="admin-log-item">
+            <div>
+              <div class="admin-log-exercise">${item.exercise_name}</div>
+              <div class="admin-log-day">${dayName}</div>
+            </div>
+            <div>
+              <div class="admin-log-time">${time}</div>
+              <div class="admin-log-user">${userId}</div>
+            </div>
+          </div>`;
+        });
+        html += '</div>';
+      });
+      document.getElementById('adminLogsList').innerHTML = html;
     }
 
     // ===== EXERCISE SVG ILLUSTRATIONS =====
@@ -953,32 +1250,38 @@
       const program = weekProgram[currentDayIndex];
       const completed = completedExercises[currentDayIndex] || [];
       const list = document.getElementById('exerciseList');
-      
-      list.innerHTML = program.exercises.map((ex, idx) => `
-        <div class="exercise-card ${completed.includes(ex.id) ? 'completed' : ''}" 
-             data-id="${ex.id}" 
+
+      // WorkoutCard-style session header
+      const totalSets = program.exercises.reduce((s, e) => s + e.sets, 0);
+      list.innerHTML = `<div class="wc-session-header">
+        <span class="wc-session-title">${program.name} ${program.emoji}</span>
+        <span class="wc-duration-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          ${totalSets}세트
+        </span>
+      </div>` + program.exercises.map((ex, idx) => `
+        <div class="wc-exercise-item ${completed.includes(ex.id) ? 'completed' : ''}"
+             data-id="${ex.id}"
              onclick="toggleExerciseDetails(${ex.id})"
              style="animation: slideUp 0.4s ease ${idx * 0.08}s both;">
-          <div class="exercise-main">
-            <div class="exercise-illustration">
-              ${exerciseSVGs[ex.svg] || ''}
-            </div>
-            <div class="exercise-info">
-              <p class="exercise-name">${ex.name}</p>
-              <p class="exercise-name-en">${ex.nameEn}</p>
-              <div class="exercise-tags">
-                <span class="tag tag-sets">${ex.sets}세트</span>
-                <span class="tag tag-reps">${ex.reps}</span>
-                <span class="tag tag-rest">휴식 ${ex.rest}</span>
-              </div>
-            </div>
-            <button class="check-btn ${completed.includes(ex.id) ? 'checked' : ''}" 
-                    onclick="toggleComplete(${ex.id}, event)">
-              ${completed.includes(ex.id) ? '✓' : '○'}
-            </button>
+          <div class="wc-exercise-icon">
+            ${exerciseSVGs[ex.svg] || ''}
           </div>
-          <div class="exercise-details">
-            <div class="detail-illustration">
+          <div class="wc-exercise-info">
+            <div class="wc-exercise-name">${ex.name}</div>
+            <div class="wc-exercise-name-en">${ex.nameEn}</div>
+            <div class="wc-exercise-detail">
+              <span class="wc-tag">${ex.sets}세트</span>
+              <span class="wc-tag">${ex.reps}</span>
+              <span class="wc-tag">휴식 ${ex.rest}</span>
+            </div>
+          </div>
+          <button class="wc-check-btn ${completed.includes(ex.id) ? 'checked' : ''}"
+                  onclick="toggleComplete(${ex.id}, event)">
+            ${completed.includes(ex.id) ? '✓' : ''}
+          </button>
+          <div class="wc-expand-area">
+            <div class="detail-illustration" style="margin-bottom:10px;">
               ${exerciseSVGs[ex.svgDetail] || exerciseSVGs[ex.svg] || ''}
             </div>
             <p class="detail-label">타겟 근육</p>
@@ -992,7 +1295,7 @@
                 </li>
               `).join('')}
             </ol>
-            <div class="tip-box">
+            <div class="tip-box" style="margin-bottom:14px;">
               <span class="tip-label">💡 TIP</span>
               <p class="tip-text">${ex.tip}</p>
             </div>
@@ -1000,11 +1303,11 @@
         </div>
       `).join('');
     }
-    
+
     function toggleExerciseDetails(id) {
-      const card = document.querySelector(`.exercise-card[data-id="${id}"]`);
+      const card = document.querySelector(`.wc-exercise-item[data-id="${id}"]`);
       const wasExpanded = card.classList.contains('expanded');
-      document.querySelectorAll('.exercise-card').forEach(c => c.classList.remove('expanded'));
+      document.querySelectorAll('.wc-exercise-item').forEach(c => c.classList.remove('expanded'));
       if (!wasExpanded) card.classList.add('expanded');
     }
     
@@ -1021,17 +1324,20 @@
       if (idx > -1) completed.splice(idx, 1);
       else completed.push(id);
       
-      const card = document.querySelector(`.exercise-card[data-id="${id}"]`);
-      const btn = card.querySelector('.check-btn');
-      
+      const card = document.querySelector(`.wc-exercise-item[data-id="${id}"]`);
+      const btn = card.querySelector('.wc-check-btn');
+      const exercise = weekProgram[currentDayIndex].exercises.find(e => e.id === id);
+
       if (completed.includes(id)) {
         card.classList.add('completed');
         btn.classList.add('checked');
         btn.textContent = '✓';
+        if (exercise) logExercise(id, exercise.name, currentDayIndex);
       } else {
         card.classList.remove('completed');
         btn.classList.remove('checked');
-        btn.textContent = '○';
+        btn.textContent = '';
+        unlogExercise(id, currentDayIndex);
       }
 
       updateProgress();
