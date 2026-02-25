@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>MY PT - 6일 운동 프로그램</title>
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
@@ -644,6 +645,37 @@
   </div>
 
   <script>
+    // ===== SUPABASE =====
+    const SUPABASE_URL = 'https://cmgcalqlbmjtfysurchd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZ2NhbHFsYm1qdGZ5c3VyY2hkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMDE3NTYsImV4cCI6MjA4NzU3Nzc1Nn0.RbWHYCBA1fJUZaQhOnq-OBtv-aMQgla9WMdMmdq937E';
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function getDeviceId() {
+      let id = localStorage.getItem('myPt_deviceId');
+      if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem('myPt_deviceId', id);
+      }
+      return id;
+    }
+
+    async function loadState() {
+      const { data } = await db
+        .from('workout_state')
+        .select('completed_exercises')
+        .eq('device_id', getDeviceId())
+        .single();
+      if (data) completedExercises = data.completed_exercises || {};
+    }
+
+    async function saveState() {
+      await db.from('workout_state').upsert({
+        device_id: getDeviceId(),
+        completed_exercises: completedExercises,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'device_id' });
+    }
+
     // ===== EXERCISE SVG ILLUSTRATIONS =====
     const exerciseSVGs = {
       // 하체
@@ -1001,10 +1033,11 @@
         btn.classList.remove('checked');
         btn.textContent = '○';
       }
-      
+
       updateProgress();
+      saveState();
     }
-    
+
     function updateProgress() {
       const program = weekProgram[currentDayIndex];
       const completed = completedExercises[currentDayIndex] || [];
@@ -1064,10 +1097,14 @@
     }
     
     // ===== INIT =====
-    updateGreeting();
-    renderWeekSchedule();
-    updateTodayCard();
-    updateStats();
+    async function init() {
+      updateGreeting();
+      renderWeekSchedule();
+      updateTodayCard();
+      await loadState();
+      updateStats();
+    }
+    init();
   </script>
 </body>
 </html>
